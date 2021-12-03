@@ -9,7 +9,7 @@ solve <- function(instr, vals, part1 = TRUE) {
 
   if (part1)
     prod(tapply(vals, forward, sum))
-  else {
+  else { # zoo::na.locf
     vals[!forward] <- cumsum(vals[!forward])
     prev <- get_prev(vals, forward)
     horiz <- vals[forward]
@@ -21,4 +21,3 @@ x <- read.table("data/aoc_2", col.names = c("instr", "vals"))
 with(x, c(part1 = solve(instr, vals),
           part2 = solve(instr, vals, part1 = FALSE)
 ))
-
