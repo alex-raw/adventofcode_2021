@@ -8,7 +8,7 @@ function solve(x; part2 = true)
             horiz += val
             depth += val * aim
         else
-            instr == "down" ? aim += val : aim -= val
+            aim += instr == "down" ? val : -val
         end
     end
     horiz * (part2 ? depth : aim)

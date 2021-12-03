@@ -1,27 +1,24 @@
-solve <- function(x, part1 = TRUE) {
-  instr <- x[, 1]
-  vals <- x[, 2]
+get_prev <- function(x, f) {
+  runs <- diff(c(which(!f), length(x) + 1)) # run lengths
+  c(0, rep(x[!f], runs - 1))
+}
 
+solve <- function(instr, vals, part1 = TRUE) {
   vals[instr == "up"] <- -vals[instr == "up"]
   forward <- instr == "forward"
 
-  if (part1) {
-    depth <- sum(vals[!forward])
-  } else {
+  if (part1)
+    prod(tapply(vals, forward, sum))
+  else {
     vals[!forward] <- cumsum(vals[!forward])
-    prev <- which(forward) - 1
-    depth <- sum(c(0, vals[prev]) * vals[forward])
+    prev <- get_prev(vals, forward)
+    horiz <- vals[forward]
+    sum(prev * horiz) * sum(horiz)
   }
-
-  sum(vals[forward]) * depth
 }
 
-x <- read.table("data/aoc_2")
-# x <- data.frame(
-#   c("forward", "down", "forward", "up", "down", "forward"),
-#   c(5, 5, 8, 3, 8, 2)
-# )
-
-solve(x, part1 = TRUE)
-solve(x, part1 = FALSE)
+x <- read.table("data/aoc_2", col.names = c("instr", "vals"))
+with(x, c(part1 = solve(instr, vals),
+          part2 = solve(instr, vals, part1 = FALSE)
+))
 
