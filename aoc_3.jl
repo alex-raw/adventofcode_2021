@@ -1,28 +1,31 @@
-using DelimitedFiles
-readdlm("data/aoc_3", "")
-
-data = parse.(Int, readlines("data/aoc_3"); base = 2)
-
-open("data/aoc_3") do file
-    for line in eachline(file)
-        println(line)
-    end
+function read_bool(path)
+    x = split.(readlines(path), "")
+    parse.(Bool, reduce(hcat, x))
 end
 
+bool2dec(x) = parse(Int, join(convert.(Int, x)), base = 2)
 
-lol = [parse.(Bool, split(row, "")) for row in readlines("data/aoc_3")]
+more_ones(x, n) = sum(x) >= (n / 2)
 
-       hcat(lol)
+find_rate(x) = [more_ones(row, size(x, 2)) for row in eachrow(x)]
 
-chomp
+function find_hidden(x)
+    i = 1
+    while size(x, 2) != 1  # scoping!! for .. eachrow(x)
+        row = x[i, :]
+        flip = !more_ones(row, length(row))
+        x = x[:, xor.(flip, row)]
+        i += 1
+    end
+    x
+end
 
-data = readlines("data/aoc_3")
-data = map(x -> parse.(Bool, split(x, "")), data)
-data = reduce(hcat, data)
-data'
+function solve(x; part2 = false)
+    f = part2 ? find_hidden : find_rate
+    bool2dec(f(x)) * bool2dec(f(.!x))
+end
 
-first(data, 1)
-
-data[1][1]
-split.(data, "")
-extract
+data = read_bool("data/aoc_3")
+# data = read_bool("data/aoc_3_test")
+solve(data)
+solve(data, part2 = true)
