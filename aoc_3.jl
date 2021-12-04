@@ -5,19 +5,18 @@ end
 
 bool2dec(x) = parse(Int, join(convert.(Int, x)), base = 2)
 
-more_ones(x, n) = sum(x) >= (n / 2)
+more_ones(x, n) = count(x) >= (n / 2)
 
 find_rate(x) = [more_ones(row, size(x, 2)) for row in eachrow(x)]
 
 function find_hidden(x)
-    i = 1
-    while size(x, 2) != 1  # scoping!! for .. eachrow(x)
+    for i in 1:size(x, 1)
         row = x[i, :]
         flip = !more_ones(row, length(row))
         x = x[:, xor.(flip, row)]
         i += 1
+        size(x, 2) == 1 && return x
     end
-    x
 end
 
 function solve(x; part2 = false)
@@ -26,6 +25,6 @@ function solve(x; part2 = false)
 end
 
 data = read_bool("data/aoc_3")
-# data = read_bool("data/aoc_3_test")
+data = read_bool("data/aoc_3_test")
 solve(data)
 solve(data, part2 = true)
