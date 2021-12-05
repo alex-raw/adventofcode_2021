@@ -1,28 +1,35 @@
-parse_bingo <- function(path) list(
-  cards = scan(path, skip = 1),
-  nums = scan(path, sep = ",", nlines = 1)
-)
+check_bingo <- function(x, n) {
+  check_dim <- \(dim) colSums(marginSums(x, c(dim, 3)) == n)
+  check_dim(1) | check_dim(2)
+}
 
-check_bingo <- function(x, l)
-  any(rowSums(x) == l) | any(colSums(x) == l)
 
-play <- function(nums, cards, l, part1 = TRUE) {
-  dims <- c(l, l, length(cards) / l^2)
-  checks <- array(FALSE, dims)
-  bingo <- logical()
+play <- function(nums, cards, n, first = TRUE) {
+  dim(cards) <- c(n, n, length(cards) / n^2)
+  checks <- array(FALSE, dim(cards))
+  bingo <- logical() # part 2
 
   for (num in nums) {
     checks[cards == num] <- TRUE
     prev_bingo <- bingo # part2
-    bingo <- apply(checks, 3, check_bingo, l)
-    if (part1 & any(bingo)) break
-    if (!part1 & all(bingo)) break
+    bingo <- check_bingo(checks, n)
+    if (first) {
+      if (any(bingo))
+        break
+    } else
+      if (all(bingo)) { # part2
+        bingo <- !prev_bingo
+        break
+    }
   }
-
-  if (!part1) bingo <- !prev_bingo # part2
-  dim(cards) <- dims
-  sum(cards[, , bingo][!checks[, , bingo]]) * num
+  num * sum(cards[, , bingo][!checks[, , bingo]])
 }
 
-with(parse_bingo("data/aoc_4"), play(nums, cards, 5))
-with(parse_bingo("data/aoc_4"), play(nums, cards, 5, part1 = FALSE))
+solve <- function(path, first = TRUE) {
+  cards <- scan(path, skip = 1, quiet = TRUE)
+  nums <- scan(path, nlines = 1, sep = ",", quiet = TRUE)
+  play(nums, cards, 5, first = first)
+}
+
+c(part1 = solve("data/aoc_4"),
+  part2 = solve("data/aoc_4", first = FALSE))
