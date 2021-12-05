@@ -6,8 +6,8 @@ read_coord <- function(path) {
 count_overlaps <- function(x1, y1, x2, y2) {
   x <- Map(seq, x1, x2)
   y <- Map(seq, y1, y2)
-  coord <- unlist(Map(\(a, b) complex(real = a, imaginary = b), x, y))
-  coord[duplicated(coord)] |> unique() |> length()
+  coord <- do.call(rbind, Map(cbind, x, y))
+  nrow(unique(coord[duplicated(coord), ]))
 }
 
 solve <- function(path, part1 = TRUE) {
