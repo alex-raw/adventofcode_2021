@@ -1,8 +1,6 @@
-check_bingo <- function(x, n) {
-  check_dim <- \(dim) colSums(marginSums(x, c(dim, 3)) == n)
-  check_dim(1) | check_dim(2)
-}
-
+check_bingo <- function(x, n)
+  colSums(marginSums(x, c(1, 3)) == n) |
+  colSums(marginSums(x, c(2, 3)) == n)
 
 play <- function(nums, cards, n, first = TRUE) {
   dim(cards) <- c(n, n, length(cards) / n^2)
@@ -28,8 +26,8 @@ play <- function(nums, cards, n, first = TRUE) {
 solve <- function(path, first = TRUE) {
   cards <- scan(path, skip = 1, quiet = TRUE)
   nums <- scan(path, nlines = 1, sep = ",", quiet = TRUE)
-  play(nums, cards, 5, first = first)
+  c(part1 = play(nums, cards, 5),
+    part2 = play(nums, cards, 5, first = FALSE))
 }
 
-c(part1 = solve("data/aoc_4"),
-  part2 = solve("data/aoc_4", first = FALSE))
+solve("data/aoc_4")
