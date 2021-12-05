@@ -1,6 +1,5 @@
 check_bingo <- function(x, n)
-  colSums(marginSums(x, c(1, 3)) == n) |
-  colSums(marginSums(x, c(2, 3)) == n)
+  colSums(n == marginSums(x, c(1, 3))) | colSums(n == marginSums(x, c(2, 3)))
 
 play <- function(nums, cards, n, first = TRUE) {
   dim(cards) <- c(n, n, length(cards) / n^2)
