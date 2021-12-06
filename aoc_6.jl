@@ -3,11 +3,10 @@ function simulate_fish(fish, days)
     for _ in 1:days
         n = counter[1]
         counter = circshift(counter, -1)
-        n > 0 && (counter[7] = counter[7] + n)
+        counter[7] += n
     end
     sum(counter)
 end
 
 fish = 1 .+ parse.(Int, split(readline("data/aoc_6"), ","))
-println(simulate_fish(fish, 80))
-println(simulate_fish(fish, 256))
+println(simulate_fish(fish, 80), "\n", simulate_fish(fish, 256))
