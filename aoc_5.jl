@@ -11,4 +11,4 @@ function solve(path)
     sum([count(==(i), d) for i in unique(d)] .> 1) # crazy slow
 end
 
-lol = solve("data/aoc_5")
+println(solve("data/aoc_5"))

@@ -1,6 +1,7 @@
 check_bingo <- function(x, n)
   colSums(n == marginSums(x, c(1, 3))) | colSums(n == marginSums(x, c(2, 3)))
 
+
 play <- function(nums, cards, n, first = TRUE) {
   dim(cards) <- c(n, n, length(cards) / n^2)
   checks <- array(FALSE, dim(cards))
@@ -10,11 +11,9 @@ play <- function(nums, cards, n, first = TRUE) {
     checks[cards == num] <- TRUE
     prev_bingo <- bingo # part2
     bingo <- check_bingo(checks, n)
-    if (first) {
-      if (any(bingo))
+    if (first & any(bingo))
         break
-    } else
-      if (all(bingo)) { # part2
+    else if (all(bingo)) { # part2
         bingo <- !prev_bingo
         break
     }
@@ -30,3 +29,15 @@ solve <- function(path, first = TRUE) {
 }
 
 solve("data/aoc_4")
+
+rowSums colSums marginSums
+apply(x, 1, sum) == rowSums(x)
+apply(x, 2, sum) == colSums(x)
+apply(x, 3, sum) == marginSums(x)
+
+readLines
+readline
+
+cbind(rnorm(1e6), rnorm(1e6)) |> rowSums() |> system.time()
+cbind(rnorm(1e6), rnorm(1e6)) |> apply(1, sum) |> system.time()
+
