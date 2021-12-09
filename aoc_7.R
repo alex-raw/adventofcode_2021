@@ -14,7 +14,6 @@ pos <- scan("data/aoc_7", sep = ",")
 c(part1 = solve(pos),
   part2 = solve(pos, part1 = FALSE))
 
-
 #---- Alternative
 solve_alt <- function(x, part1 = TRUE) {
   optimal <- if (part1) median else mean
@@ -22,6 +21,3 @@ solve_alt <- function(x, part1 = TRUE) {
   if (part1) sum(x)
   else sum(unlist(lapply(x, seq_len)))
 }
-
-c(part1 = solve(pos),
-  part2 = solve(pos, part1 = FALSE))
