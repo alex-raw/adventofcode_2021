@@ -6,7 +6,7 @@ rgsub <- function(pattern, replacement, x) {
     rgsub(pattern, replacement, ans)
 }
 
-replace_with_matching <- function(x) {
+find_matching_closed <- function(x) {
   x <- gsub(")|}|>|]", "", x)
   strsplit(chartr("{[(<", "}])>", x), "")
 }
@@ -29,7 +29,7 @@ solve <- function(x, part1 = TRUE) {
     return(sum(points[illegal[corrupted]]))
 
   points[1:4] <- 1:4
-  replace_with_matching(x[!corrupted]) |>
+  find_matching_closed(x[!corrupted]) |>
     sapply(\(x) get_score(points[rev(x)])) |>
     sort() |> median()
 }
