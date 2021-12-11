@@ -31,10 +31,11 @@ solve1 <- function(x) {
 solve2 <- function(x) {
   y <- array(0L, dim(x))
   y[x == 9L] <- -1L  # mark basin margins
-  tabulate(connected_components(y))[-1L] |> # take away counts of zeros
-  sort() |> tail(3L) |> prod()
+  tabulate(connected_components(y)) |>
+    sort() |> tail(3L) |> prod()
 }
 
 x <- as.matrix(read.fwf("data/aoc_9", rep(1, 100)))
 c(part1 = solve1(x),
   part2 = solve2(x)) #|> system.time()
+
