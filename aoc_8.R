@@ -4,7 +4,7 @@ parse_signals <- function(path) {
 }
 
 solve1 <- function(x, chars) {
-  x <- nchar(x[, -(1:10)])
+  x <- nchar(x[, 11:14])
   counts <- nchar(chars)
   once <- counts[counts %in% which(tabulate(counts) == 1)]
   sum(x %in% once)
@@ -54,11 +54,9 @@ solve2 <- function(x, chars) {
     sum()
 }
 
-x <- parse_signals("data/aoc_8_test")
 chars <- c(`0` = "abcefg", `1` = "cf", `2` = "acdeg", `3` = "acdfg", `4` = "bcdf", `5` = "abdfg", `6` = "abdefg", `7` = "acf", `8` = "abcdefg", `9` = "abcdfg")
+x <- parse_signals("data/aoc_8_test")
 
-bin_map(chars[1:10])
-bin_map(x[1, 1:10])
+c(part1 = solve1(x, chars),
+  part2 = solve2(x, chars))
 
-solve1(x, chars)
-solve2(x, chars)
