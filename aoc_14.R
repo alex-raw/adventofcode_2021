@@ -11,37 +11,44 @@ parse_polymers <- function(path) {
 
 make_counter <- function(polymer, rules) {
   counter <- array(0L, dim(rules))
-  for (i in seq_along(polymer))
-    counter[polymer[i], polymer[i + 1]] <- counter[polymer[i], polymer[i + 1]] + 1L
+  inds <- cbind(polymer[-length(polymer)], polymer[-1])
+  counter[inds] <- counter[inds] + 1L
   counter
 }
 
-lol <- function(x, counter) {
-  mode(x) <- "numeric"
-  arg <- x > 0
-  ids <- which(arg, arr.ind = TRUE)
-  ids <- rbind(cbind(ids[, 1], rules[ids], which(arg)),
-               cbind(rules[ids], ids[, 2], which(arg)))
-  new_counter <- array(0L, dim(rules))
-  for (i in seq(nrow(ids))) {
-    ind <- ids[i, 1:2, drop = FALSE]
-    new_counter[ind] <- new_counter[ind] + x[ids[i, 3]]
-  }
-  counter <- counter + new_counter
-  list(new_counter, counter)
+find_next_inds <- function(rules) {
+  i <- arrayInd(seq_along(rules), dim(rules))
+  out <- rbind(cbind(i[, 1], rules[i]),
+               cbind(rules[i], i[, 2]))
+  out[, 1] + ncol(rules) * (out[, 2] - 1)
+}
+
+insert <- function(x, y, rules, ids1, ids2) {
+  next_x <- array(0L, dim(rules))
+  for (i in seq_along(ids1))
+    next_x[ids1[i]] <- next_x[ids1[i]] + x[ids2[i]]
+  list(next_x, y + next_x)
+}
+
+solve1 <- function(polymer, rules, steps) {
+  counter <- make_counter(polymer, rules)
+  mode(counter) <- "numeric"
+  counter <- list(counter, counter)
+
+  ids1 <- find_next_inds(rules)
+  ids2 <- rep(seq_along(rules), 2)
+  for (i in seq_len(steps - 1))
+    counter <- insert(counter[[1]], counter[[2]], rules, ids1, ids2)
+
+  i <- seq_len(ncol(counter[[2]]))
+  ans <- sapply(i, \(x) sum(counter[[2]][x == rules]))
+  diff(range(ans + tabulate(polymer)))
 }
 
 x <- parse_polymers("data/aoc_14")
-counter <- make_counter(x$polymer, x$rules)
+c(part1 = solve1(x$polymer, x$rules, 10),
+  part2 = solve1(x$polymer, x$rules, 40)) |> print(digits = 15) |> system.time()
 
-current <- list(counter, counter)
-for (i in 1:39) {
-  current <- lol(current[[1]], current[[2]])
-}
-
-ans <- sapply(seq_len(ncol(current[[2]])), \(x) sum(current[[2]][x == rules]))
-ans <- ans + tabulate(polymer)
-diff(range(ans)) |> print(digits = 15)
 
 # old part1
 # count_insertions <- function(lhs, rhs, rules, steps) {
