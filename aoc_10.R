@@ -24,14 +24,14 @@ solve <- function(x, part1 = TRUE) {
   illegal <- substring(illegal, 1, 1)      # get first illegal
   corrupted <- nzchar(illegal)             # empty string position means corrupted
 
-  points <- c(`)`= 3, `]` = 57, `}` = 1197, `>` = 25137)
+  points <- c(`)` = 3, `]` = 57, `}` = 1197, `>` = 25137)
   if (part1)
     return(sum(points[illegal[corrupted]]))
 
   points[1:4] <- 1:4
   find_matching_closed(x[!corrupted]) |>
     sapply(\(x) get_score(points[rev(x)])) |>
-    sort() |> median()
+    median()
 }
 
 x <- readLines("data/aoc_10")

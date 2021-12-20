@@ -45,37 +45,38 @@ solve1 <- function(polymer, rules, steps) {
   diff(range(ans + tabulate(polymer)))
 }
 
-x <- parse_polymers("data/aoc_14")
+x <- parse_polymers("data/aoc_14") |> browser()
+
 c(part1 = solve1(x$polymer, x$rules, 10),
   part2 = solve1(x$polymer, x$rules, 40)) |> print(digits = 15) |> system.time()
 
 
 # old part1
-# count_insertions <- function(lhs, rhs, rules, steps) {
-#   depth <<- depth + 1L
+count_insertions <- function(lhs, rhs, rules, steps) {
+  depth <<- depth + 1L
 
-#   middle <- rules[lhs, rhs]
-#   counter[middle] <<- counter[middle] + 1L
+  middle <- rules[lhs, rhs]
+  counter[middle] <<- counter[middle] + 1L
 
-#   if (depth >= steps) {
-#     depth <<- depth - 1L
-#     return()
-#   }
+  if (depth >= steps) {
+    depth <<- depth - 1L
+    return()
+  }
 
-#   count_insertions(lhs, middle, rules, steps)
-#   count_insertions(middle, rhs, rules, steps)
-#   depth <<- depth - 1L
-# }
+  count_insertions(lhs, middle, rules, steps)
+  count_insertions(middle, rhs, rules, steps)
+  depth <<- depth - 1L
+}
 
-# solve1 <- function(polymer, rules, steps) {
-#   for (i in seq(length(polymer) - 1L)) {
-#     lhs <- polymer[i]
-#     rhs <- polymer[i + 1L]
-#     depth <<- 0L
-#     sums <- numeric(ncol(rules))
-#     count_insertions(lhs, rhs, rules, steps = steps)
-#     sums <- counter + sums
-#   }
-#   sums
-# }
+solve1 <- function(polymer, rules, steps) {
+  for (i in seq(length(polymer) - 1L)) {
+    lhs <- polymer[i]
+    rhs <- polymer[i + 1L]
+    depth <<- 0L
+    sums <- numeric(ncol(rules))
+    count_insertions(lhs, rhs, rules, steps = steps)
+    sums <- counter + sums
+  }
+  sums
+}
 
