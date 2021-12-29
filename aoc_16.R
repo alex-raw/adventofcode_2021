@@ -5,72 +5,72 @@ hex_to_bin <- function(x) {
     strsplit("") |> unlist() |> as.integer()
 }
 
-bin_to_dec <- function(x) {
+bin_to_dec <- function(x) { # strtoi silently overflows
   x <- as.numeric(x)
-  sum(x * 2^rev((seq_along(x) - 1)))
+  sum(x * 2^seq(length(x) - 1, 0))
 }
 
-header <- c("V", "V", "V", "T", "T", "T")
 funs <- c(sum, prod, min, max, c, `>`, `<`, `==`)
-
-label_ids <- \(x, n)
-  rep_len(rep.int(seq_len(n), rep.int(5, n)), length(x) - 6)
-
-find_last <- function(x) {
-  inds <- seq.int(7, length(x))
-  inds <- inds[seq_along(inds) %% 5 == 1]
-  4 + inds[which(x[inds] == 0)[1]]
-}
+funs <- c("sum", "prod", "min", "max", "c", ">", "<", "==")
 
 label_packet <- function(x) {
-  last <- find_last(x)
-  temp <- x[1:last]
+  firsts <- seq(7, length(x), by = 5)
+  last <- 4 + firsts[which(x[firsts] == 0)[1]]
+  literals <- x[7:last]
   rest <- x[-(1:last)]
-  ngroups <- (length(temp) - 6) / 5
+  ln <- length(literals)
+  # c(rep(F, ln), label(rest))
 
-  c(header, letters[label_ids(temp, ngroups)], label(rest))
+  # get literal values
+  vals <- tapply(literals, gl(ln / 5, 5), bin_to_dec) |> unname()
+  list(vals, label(rest))
 }
 
 label_operator <- function(x, type) {
   n <- if (x[7]) 11 else 15
-  sub_labels <- label(x[-seq_len(7 + n)])
-
-  c(header, "I", rep_len("L", n), sub_labels)
+  rest <- x[-seq_len(7 + n)]
+  # c(rep(F, n + 1), label(rest)) # + 1 for I
+  label(rest)
 }
 
-execute_operator <- function(x, type) {
-  n <- if (x[7]) 11 else 15
-  label(x[-(1:(6 + n))])
-} # TODO: fails with diadic functions
-
+header <- c(T, T, T, F, F, F) # Version number is TRUE
 label <- function(x) {
   if (length(x) == 0 || all(x == 0))
     return()
   type_id <- bin_to_dec(x[4:6])
   fun <- funs[[type_id + 1]]
   if (type_id == 4) {
-    # label_packet(x)
-    fun(bin_to_dec(x[-(1:6)]))
+    # c(header, label_packet(x))
+    unlist(label_packet(x), recursive = FALSE)
   } else {
-    # label_operator(x, type_id)
-    fun(execute_operator(x))
+    # c(header, label_operator(x, type_id))
+    if (fun %in% c("==", "<", ">")) {
+      if (!x[7]) {
+        n <- 7 + 15 + bin_to_dec(x[seq(8, length = 15)])
+        list(fun, label(x[22:n]), label(x[-(1:n)]))
+      } else
+        list(fun, label_operator(x, type_id))
+    } else
+      list(fun, label_operator(x, type_id))
   }
 }
 
 solve1 <- function(x) {
-  return(label(x))
-  versions <- x[label(x) == "V"]
-  split(versions, (seq_along(versions) - 1) %/% 3) |>
-    sapply(bin_to_dec) |> sum()
+  versions <- x[is_version(x)]
+  ln <- length(versions)
+  tapply(versions, gl(ln / 3, 3), bin_to_dec) |> sum()
 }
 
 x <-
 # readLines("data/aoc_16") |>
-"C200B40A82" |>
-# "9C0141080250320F1802104A08" |>
+# "C200B40A82" |>
+"9C0141080250320F1802104A08" |>
   strsplit("") |> unlist() |> hex_to_bin()
 
 # c(part1 = solve1(x),
 #   part2 = solve2(x)) |> print() |> system.time()
-solve1(x)
+# solve1(x) #|> system.time()
+lol = label(x)
+
+str(lol)
 
